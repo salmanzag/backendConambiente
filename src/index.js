@@ -74,7 +74,7 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:4200')
   .split(',')
   .map(s => s.trim());
 
-  
+
 app.use(cors()); // Esto permite peticiones desde cualquier lugar
 
 
@@ -261,25 +261,37 @@ app.get('/', (req, res) => {
 });
 
 // -----------------------------
-// Auth Routes
+// Auth Routes (MODIFICADO)
 // -----------------------------
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
 
-  // Usamos directamente las variables de entorno para asegurar que lean el valor actual de Render
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email y contraseña son obligatorios' });
+  }
+
+  // LEER VARIABLES AQUÍ DENTRO PARA ASEGURAR QUE EXISTAN
   const envEmail = process.env.ADMIN_EMAIL;
   const envPassword = process.env.ADMIN_PASSWORD;
 
-  if (email !== envEmail || password !== envPassword) {
-    console.log('Credenciales no coinciden');
-    return res.status(401).json({ message: 'Credenciales inválidas' });
+  console.log('Intento de login:', email);
+  
+  // 1. Validar Email
+  if (email !== envEmail) {
+    return res.status(401).json({ message: 'Credenciales inválidas (Email)' });
   }
 
-  // Si coinciden, generas el token
+  // 2. Validar Contraseña (Comparación directa para evitar errores de hash en Render)
+  // Si en el futuro quieres usar bcrypt, úsalo aquí dentro, no afuera.
+  if (password !== envPassword) {
+     return res.status(401).json({ message: 'Credenciales inválidas (Password)' });
+  }
+
+  // 3. Generar Token
   const token = jwt.sign(
-    { userId: 'admin1', email: envEmail, role: 'admin' },
+    { userId: 'admin-01', email: envEmail, role: 'admin' },
     JWT_SECRET,
-    { expiresIn: '2h' }
+    { expiresIn: '4h' }
   );
 
   res.json({
