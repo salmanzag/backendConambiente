@@ -74,14 +74,8 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:4200')
   .split(',')
   .map(s => s.trim());
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // permitir requests sin Origin (curl/postman/servidor)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
-  }
-}));
+  
+app.use(cors()); // Esto permite peticiones desde cualquier lugar
 
 
 app.use(express.json());
