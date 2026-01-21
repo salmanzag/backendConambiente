@@ -272,34 +272,25 @@ app.get('/', (req, res) => {
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email y contraseña son obligatorios' });
-  }
+  // Usamos directamente las variables de entorno para asegurar que lean el valor actual de Render
+  const envEmail = process.env.ADMIN_EMAIL;
+  const envPassword = process.env.ADMIN_PASSWORD;
 
-  console.log('Login attempt:', { email, passwordReceived: password });
-  console.log('Expected:', { email: adminUser.email, password: ADMIN_PASSWORD });
-
-  if (email !== adminUser.email) {
-    console.log('Email mismatch');
+  if (email !== envEmail || password !== envPassword) {
+    console.log('Credenciales no coinciden');
     return res.status(401).json({ message: 'Credenciales inválidas' });
   }
 
-  const passwordOk = bcrypt.compareSync(password, adminUser.passwordHash);
-  console.log('Password check:', passwordOk);
-
-  if (!passwordOk) {
-    return res.status(401).json({ message: 'Credenciales inválidas' });
-  }
-
+  // Si coinciden, generas el token
   const token = jwt.sign(
-    { userId: adminUser.id, email: adminUser.email, role: 'admin' },
+    { userId: 'admin1', email: envEmail, role: 'admin' },
     JWT_SECRET,
     { expiresIn: '2h' }
   );
 
   res.json({
     token,
-    user: { email: adminUser.email, role: 'admin' }
+    user: { email: envEmail, role: 'admin' }
   });
 });
 
