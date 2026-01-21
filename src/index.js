@@ -263,7 +263,7 @@ app.get('/', (req, res) => {
 // -----------------------------
 // Auth Routes (MODIFICADO)
 // -----------------------------
-app.post('/api/auth/login', (req, res) => {
+app.post('/auth/login', (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
